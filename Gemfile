@@ -4,5 +4,6 @@ gem 'rails', '~> 4.2.0'
 gem 'sidekiq'
 gem 'pg'
 
-group :development, :test do
+group :development do
+  gem 'sinatra', require: nil
 end
