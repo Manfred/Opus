@@ -4,6 +4,8 @@ require 'rails/test_help'
 require 'fileutils'
 
 class ActiveSupport::TestCase
+  include ActiveJob::TestHelper
+
   fixtures :all
 
   setup do

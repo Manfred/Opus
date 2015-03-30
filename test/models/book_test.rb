@@ -26,4 +26,23 @@ class BookTest < ActiveSupport::TestCase
 
     assert_equal before, Book.pending.count
   end
+
+  test "marks a book as pending after an update" do
+    before = Book.pending.count
+
+    book = books(:pride_and_prejudice)
+    book.title += 's'
+    book.save!
+
+    assert_equal 'pending', book.reload.bundle_status
+    assert_equal before + 1, Book.pending.count
+  end
+
+  test "schedules book bundle after update" do
+    assert_enqueued_jobs(+1) do
+      book = books(:pride_and_prejudice)
+      book.title += 's'
+      book.save!
+    end
+  end
 end
