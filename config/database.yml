@@ -1,0 +1,11 @@
+development:
+  database: opus_development
+  adapter: postgresql
+  encoding: unicode
+  host: 127.0.0.1
+test:
+  database: opus_test
+  min_messages: warning
+  adapter: postgresql
+  encoding: unicode
+  host: 127.0.0.1
