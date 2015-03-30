@@ -9,6 +9,10 @@ class Book < ActiveRecord::Base
     '/' + BookBundler.new(book: self).relative_path
   end
 
+  def force_rebuild
+    BuildBookBundleJob.perform_later(id, force: true)
+  end
+
 protected
 
   def mark_as_pending
@@ -19,8 +23,14 @@ protected
     BuildBookBundleJob.perform_later(id)
   end
 
-  def self.take(id)
-    if book = Book.pending.where(id: id).lock(true).first
+  def self.take(id, force: false)
+    if force
+      book = Book.where(id: id).lock(true).first
+    else
+      book = Book.pending.where(id: id).lock(true).first
+    end
+
+    if book
       yield book
       # Don't trigger save callback, otherwise it will schedule another
       # job.

@@ -43,6 +43,21 @@ class BookTest < ActiveSupport::TestCase
     end
   end
 
+  test "froces to take a book for processing when it's not pending" do
+    book = books(:pride_and_prejudice)
+    took = false
+
+    assert_no_difference('Book.pending.count') do
+      Book.take(book.id, force: true) do |book|
+        # A successful take will mark the book as
+        # processed.
+        took = true
+      end
+    end
+
+    assert took
+  end
+
   test "leaves a book for processing when it fails" do
     before = Book.pending.count
     book = books(:great_expectations)
@@ -73,6 +88,13 @@ class BookTest < ActiveSupport::TestCase
       book = books(:pride_and_prejudice)
       book.title += 's'
       book.save!
+    end
+  end
+
+  test "schedules forced book bundle" do
+    assert_enqueued_jobs(+1) do
+      book = books(:pride_and_prejudice)
+      book.force_rebuild
     end
   end
 
