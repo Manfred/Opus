@@ -45,4 +45,8 @@ class BookTest < ActiveSupport::TestCase
       book.save!
     end
   end
+
+  test "returns its public path" do
+    assert books(:pride_and_prejudice).path.to_s.ends_with?('bundle.html')
+  end
 end

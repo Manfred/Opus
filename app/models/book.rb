@@ -1,8 +1,13 @@
 class Book < ActiveRecord::Base
+  scope :ordered, -> { order(title: :desc) }
   scope :pending, -> { where(bundle_status: 'pending') }
 
   before_save :mark_as_pending
   after_save :schedule_bundle
+
+  def path
+    '/' + BookBundler.new(book: self).relative_path
+  end
 
 protected
 
