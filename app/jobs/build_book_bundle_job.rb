@@ -2,7 +2,7 @@ class BuildBookBundleJob < ActiveJob::Base
   queue_as :default
 
   def perform(*args)
-    Book.take(args[0]) do |book|
+    Book.take(*args) do |book|
       BookBundler.generate(book)
     end
   end
