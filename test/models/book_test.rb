@@ -4,21 +4,66 @@ class BookTest < ActiveSupport::TestCase
   class ProcessingFailed < StandardError
   end
 
-  test "takes a book for processing until all are down" do
-    (Book.pending.count + 1).times do
-      Book.take do |book|
+  test "takes a book for processing" do
+    book = books(:great_expectations)
+    took = false
+
+    assert_difference('Book.pending.count', -1) do
+      Book.take(book.id) do |book|
         # A successful take will mark the book as
         # processed.
+        took = true
       end
     end
-    assert 0, Book.pending.count
+
+    assert took
+  end
+
+  test "does not take a book for processing when it's not pending" do
+    book = books(:pride_and_prejudice)
+    took = false
+
+    assert_no_difference('Book.pending.count') do
+      Book.take(book.id) do |book|
+        # A successful take will mark the book as
+        # processed.
+        took = true
+      end
+    end
+
+    refute took
+  end
+
+  test "is resiliant against superfluous queuing" do
+    book = books(:great_expectations)
+    assert_difference('Book.pending.count', -1) do
+      10.times do
+        Book.take(book.id) { |book| }
+      end
+    end
+  end
+
+  test "froces to take a book for processing when it's not pending" do
+    book = books(:pride_and_prejudice)
+    took = false
+
+    assert_no_difference('Book.pending.count') do
+      Book.take(book.id, force: true) do |book|
+        # A successful take will mark the book as
+        # processed.
+        took = true
+      end
+    end
+
+    assert took
   end
 
   test "leaves a book for processing when it fails" do
     before = Book.pending.count
+    book = books(:great_expectations)
 
     begin
-      Book.take do
+      Book.take(book.id) do
         raise BookTest::ProcessingFailed, "Force failure"
       end
     rescue BookTest::ProcessingFailed
@@ -43,6 +88,13 @@ class BookTest < ActiveSupport::TestCase
       book = books(:pride_and_prejudice)
       book.title += 's'
       book.save!
+    end
+  end
+
+  test "schedules forced book bundle" do
+    assert_enqueued_jobs(+1) do
+      book = books(:pride_and_prejudice)
+      book.force_rebuild
     end
   end
 
