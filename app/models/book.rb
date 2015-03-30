@@ -17,8 +17,9 @@ protected
   def self.take
     if book = Book.pending.lock(true).first
       yield book
-      book.bundle_status = 'generated'
-      book.save!
+      # Don't trigger save callback, otherwise it will schedule another
+      # job.
+      book.update_column(:bundle_status, 'generated')
     end
   end
 end
