@@ -1,0 +1,18 @@
+<h1><%= @title = 'Books' %></h1>
+
+<ul class="actions">
+  <li><%= link_to 'New book', new_book_path %></li>
+</ul>
+
+<% if @books.empty? %>
+  <p class="empty">There are no books, click ‘New book’ to create one.</p>
+<% else %>
+  <table>
+    <% @books.each do |book| %>
+      <tr>
+        <td><%= link_to book.title, book.path %></td>
+        <td><%= link_to 'Edit', [:edit, book] %></td>
+      </tr>
+    <% end %>
+  </table>
+<% end %>

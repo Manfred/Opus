@@ -1,0 +1,8 @@
+<h1><%= @title = 'Edit: ' + @book.title %></h1>
+
+<%= form_for(@book) do |f| %>
+  <%= render 'books/form', f: f %>
+  <div class="submit">
+    <%= f.button 'Save changes' %>
+  </div>
+<% end %>
