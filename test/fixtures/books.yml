@@ -1,6 +1,9 @@
 pride_and_prejudice:
   title: Pride and Prejudice
+  bundle_status: generated
 great_expectations:
   title: Great Expectations
+  bundle_status: pending
 lord_of_the_flies:
   title: Lord of the Flies
+  bundle_status: pending
