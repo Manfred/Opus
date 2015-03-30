@@ -19,8 +19,8 @@ protected
     BuildBookBundleJob.perform_later(id)
   end
 
-  def self.take
-    if book = Book.pending.lock(true).first
+  def self.take(id)
+    if book = Book.pending.where(id: id).lock(true).first
       yield book
       # Don't trigger save callback, otherwise it will schedule another
       # job.
